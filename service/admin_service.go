@@ -7,6 +7,7 @@ type serviceAdmin interface {
 	Read() (*[]model.EntitasBPH, error)
 	Update(*model.EntitasBPH) (*model.EntitasBPH, error)
 	Delete(*model.EntitasBPH) (*model.EntitasBPH, error)
+	FindByUsername(string) (*model.EntitasBPH, error)
 	FindByID(uint) (*model.EntitasBPH, error)
 }
 
@@ -15,10 +16,17 @@ type adminService struct{}
 func NewAdminService() serviceAdmin {
 	return &adminService{}
 }
-
 func (s *adminService) FindByID(id uint) (*model.EntitasBPH, error) {
 	var entitas model.EntitasBPH
-	if err := DB.Where("id = ?", id).First(&entitas).Error; err != nil {
+	if err := DB.Where("id = ?", id).Take(&entitas).Error; err != nil {
+		return nil, err
+	}
+	return &entitas, nil
+}
+
+func (s *adminService) FindByUsername(username string) (*model.EntitasBPH, error) {
+	var entitas model.EntitasBPH
+	if err := DB.Where("username = ?", username).Take(&entitas).Error; err != nil {
 		return nil, err
 	}
 	return &entitas, nil

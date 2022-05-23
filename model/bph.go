@@ -9,5 +9,6 @@ type EntitasBPH struct {
 	Password            string
 	NamaBPH             string
 	DeskripsiKementrian string
+	Username            string
 	EntitasProkers      []EntitasProker
 }
