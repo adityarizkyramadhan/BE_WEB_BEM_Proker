@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -13,8 +12,7 @@ var env, _ = godotenv.Read()
 
 func GenerateJWToken(id uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  id,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"id": id,
 	})
 	signedToken, err := token.SignedString(env["JWT_KEY"])
 	if err != nil {
