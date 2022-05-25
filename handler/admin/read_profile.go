@@ -13,6 +13,7 @@ type responseBph struct {
 	NamaBPH             string `json:"nama_bph"`
 	DeskripsiKementrian string `json:"deskripsi_kementrian"`
 	Username            string `json:"username"`
+	Id                  uint   `json:"id"`
 }
 
 func ReadProfile(c *gin.Context) {
@@ -28,5 +29,6 @@ func ReadProfile(c *gin.Context) {
 		NamaBPH:             dataDb.NamaBPH,
 		DeskripsiKementrian: dataDb.DeskripsiKementrian,
 		Username:            dataDb.Username,
+		Id:                  dataDb.ID,
 	}))
 }

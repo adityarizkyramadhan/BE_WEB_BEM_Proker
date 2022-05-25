@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"BE_WEB_BEM_Proker/helper"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -32,6 +34,7 @@ func ValidateJWToken() gin.HandlerFunc {
 		token, err := jwt.Parse(bearerToken, ekstractToken)
 		if err != nil {
 			// Kasih respon
+			c.AbortWithStatusJSON(http.StatusUnauthorized, helper.Response(false, http.StatusUnauthorized, "Invalid token", err))
 			return
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -39,6 +42,7 @@ func ValidateJWToken() gin.HandlerFunc {
 			c.Next()
 		} else {
 			// Kasih respon
+			c.AbortWithStatusJSON(http.StatusUnauthorized, helper.Response(false, http.StatusUnauthorized, "Invalid token", err))
 			return
 		}
 	}
