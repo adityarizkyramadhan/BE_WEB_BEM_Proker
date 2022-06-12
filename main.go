@@ -1,25 +1,25 @@
 package main
 
 import (
-	"BE_WEB_BEM_Proker/model"
-	"BE_WEB_BEM_Proker/service"
-	"fmt"
+	"BE_WEB_BEM_Proker/infrastructure/database_connection"
+	"BE_WEB_BEM_Proker/infrastructure/database_driver"
+	"BE_WEB_BEM_Proker/middleware"
+	"BE_WEB_BEM_Proker/route"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	var bph = model.EntitasBPH{
-		Kementrian:          "Kementrian Sosling",
-		Kontak:              "0812-3456-7890",
-		Password:            "12345678",
-		NamaBPH:             "BEM",
-		DeskripsiKementrian: "Test",
-	}
-	admin := service.NewAdminService()
-	_, err := admin.Create(&bph)
+	e := gin.Default()
+	e.Use(middleware.Cors())
+	env, err := database_driver.NewDriverDatabase()
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
-	fmt.Println("Success create new bph")
-	fmt.Println(admin.FindByID(1))
+	db, err := database_connection.MakeConnection(env)
+	if err != nil {
+		panic(err)
+	}
+	route.RouteAllHandler(e, db)
+	e.Run()
 }

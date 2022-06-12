@@ -1,22 +1,24 @@
 package middleware
 
 import (
-	"BE_WEB_BEM_Proker/helper"
+	"BE_WEB_BEM_Proker/infrastructure/app"
+	"BE_WEB_BEM_Proker/utils/response"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 )
 
-var env, _ = godotenv.Read()
-
 func GenerateJWToken(id uint) (string, error) {
+	env, err := app.NewDriverApp()
+	if err != nil {
+		return "", err
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id": id,
 	})
-	signedToken, err := token.SignedString(env["JWT_KEY"])
+	signedToken, err := token.SignedString([]byte(env.SecretKey))
 	if err != nil {
 		return "", err
 	}
@@ -33,24 +35,26 @@ func ValidateJWToken() gin.HandlerFunc {
 		bearerToken = strings.ReplaceAll(bearerToken, "Bearer ", "")
 		token, err := jwt.Parse(bearerToken, ekstractToken)
 		if err != nil {
-			// Kasih respon
-			c.AbortWithStatusJSON(http.StatusUnauthorized, helper.Response(false, http.StatusUnauthorized, "Invalid token", err))
+			c.JSON(http.StatusForbidden, response.ResponseWhenFail("Failed to extract token", err.Error()))
 			return
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("id", claims["id"])
 			c.Next()
 		} else {
-			// Kasih respon
-			c.AbortWithStatusJSON(http.StatusUnauthorized, helper.Response(false, http.StatusUnauthorized, "Invalid token", err))
+			c.JSON(http.StatusForbidden, response.ResponseWhenFail("Failed to extract token", err.Error()))
 			return
 		}
 	}
 }
 
 func ekstractToken(token *jwt.Token) (interface{}, error) {
+	env, err := app.NewDriverApp()
+	if err != nil {
+		return "", err
+	}
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, jwt.ErrSignatureInvalid
 	}
-	return env["JWT_KEY"], nil
+	return []byte(env.SecretKey), nil
 }
