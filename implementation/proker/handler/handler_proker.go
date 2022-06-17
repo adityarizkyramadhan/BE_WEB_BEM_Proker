@@ -93,3 +93,7 @@ func (h handlerProker) Delete(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success to delete data", nil))
 }
+
+func (h handlerProker) Login(c *gin.Context) {
+
+}

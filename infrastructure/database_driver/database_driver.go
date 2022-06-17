@@ -4,32 +4,24 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type DriverDatabase struct {
-	Host     string
-	Password string
-	Port     string
+type DriverSupabase struct {
 	User     string
-	Name     string
+	Password string
+	Host     string
+	Port     string
+	DbName   string
 }
 
-func readEnv() (DriverDatabase, error) {
-	envDb, err := godotenv.Read()
+func ReadEnvSupabase() (DriverSupabase, error) {
+	envSupabase, err := godotenv.Read()
 	if err != nil {
-		return DriverDatabase{}, err
+		return DriverSupabase{}, err
 	}
-	return DriverDatabase{
-		Host:     envDb["DB_HOST"],
-		Password: envDb["DB_PASSWORD"],
-		Port:     envDb["DB_PORT"],
-		User:     envDb["DB_USER"],
-		Name:     envDb["DB_NAME"],
+	return DriverSupabase{
+		User:     envSupabase["SUPABASE_USER"],
+		Password: envSupabase["SUPABASE_PASSWORD"],
+		Host:     envSupabase["SUPABASE_HOST"],
+		Port:     envSupabase["SUPABASE_PORT"],
+		DbName:   envSupabase["SUPABASE_DB_NAME"],
 	}, nil
-}
-
-func NewDriverDatabase() (DriverDatabase, error) {
-	dataEnv, err := readEnv()
-	if err != nil {
-		return DriverDatabase{}, err
-	}
-	return dataEnv, nil
 }

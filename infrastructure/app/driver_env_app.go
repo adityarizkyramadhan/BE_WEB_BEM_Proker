@@ -4,6 +4,7 @@ import "github.com/joho/godotenv"
 
 type DriverApp struct {
 	SecretKey string
+	Password  string
 }
 
 func readEnv() (DriverApp, error) {
@@ -13,6 +14,7 @@ func readEnv() (DriverApp, error) {
 	}
 	return DriverApp{
 		SecretKey: envApp["SECRET_KEY"],
+		Password:  envApp["PASSWORD_LOGIN"],
 	}, nil
 }
 

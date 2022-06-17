@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateJWToken(id uint) (string, error) {
+func GenerateJWToken(id string) (string, error) {
 	env, err := app.NewDriverApp()
 	if err != nil {
 		return "", err

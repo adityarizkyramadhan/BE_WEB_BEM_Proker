@@ -20,7 +20,7 @@ type EntitasProker struct {
 type EntitasProkerInput struct {
 	NamaProker      string `json:"nama_proker,omitempty" binding:"required"`
 	WaktuTerlaksana string `json:"waktu_terlaksana,omitempty" binding:"required"`
-	Kementrian      string `json:"kementrian" binding:"required"'`
+	Kementrian      string `json:"kementrian" binding:"required"`
 	Deskripsi       string `json:"deskripsi,omitempty" binding:"required"`
 	PenanggungJawab string `json:"penanggung_jawab,omitempty" binding:"required"`
 	KontakPJ        string `json:"kontak_pj,omitempty" binding:"required"`

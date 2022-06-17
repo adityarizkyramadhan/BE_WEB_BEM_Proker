@@ -12,7 +12,7 @@ import (
 func main() {
 	e := gin.Default()
 	e.Use(middleware.Cors())
-	env, err := database_driver.NewDriverDatabase()
+	env, err := database_driver.ReadEnvSupabase()
 	if err != nil {
 		panic(err)
 	}
@@ -21,5 +21,7 @@ func main() {
 		panic(err)
 	}
 	route.RouteAllHandler(e, db)
-	e.Run()
+	if err := e.Run(); err != nil {
+		panic(err)
+	}
 }
