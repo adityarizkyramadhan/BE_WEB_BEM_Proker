@@ -13,8 +13,19 @@ type EntitasProker struct {
 	Deskripsi       string
 	PenanggungJawab string
 	KontakPJ        string
-	LinkPDFProker   string
-	LinkDokumentasi string
+	LinkImages      string
+	LinkImages2     string
+}
+
+type Admin struct {
+	*gorm.Model
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type AdminInput struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type EntitasProkerInput struct {
@@ -24,8 +35,9 @@ type EntitasProkerInput struct {
 	Deskripsi       string `json:"deskripsi,omitempty" binding:"required"`
 	PenanggungJawab string `json:"penanggung_jawab,omitempty" binding:"required"`
 	KontakPJ        string `json:"kontak_pj,omitempty" binding:"required"`
-	LinkPDFProker   string `json:"link_pdf_proker,omitempty" binding:"required"`
-	LinkDokumentasi string `json:"link_dokumentasi,omitempty" binding:"required"`
+	LinkPdfProker   string `json:"link_pdf_proker,omitempty" binding:"required"`
+	LinkImages      string `json:"save_images,omitempty" binding:"required"`
+	LinkImages2     string `json:"save_images2,omitempty" binding:"required"`
 }
 
 type ProkerService interface {
@@ -34,6 +46,8 @@ type ProkerService interface {
 	Create(*EntitasProker) error
 	Update(uint, *EntitasProker) error
 	Delete(uint) error
+	Login(string, string) (*Admin, error)
+	Register(*Admin) (*Admin, error)
 }
 
 type ProkerHandler interface {
@@ -41,4 +55,6 @@ type ProkerHandler interface {
 	GetByID(*gin.Context)
 	Create(*gin.Context)
 	Delete(*gin.Context)
+	Login(*gin.Context)
+	Register(*gin.Context)
 }

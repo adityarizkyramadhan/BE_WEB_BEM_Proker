@@ -2,6 +2,7 @@ package handler
 
 import (
 	"BE_WEB_BEM_Proker/domain"
+	"BE_WEB_BEM_Proker/middleware"
 	"BE_WEB_BEM_Proker/utils/response"
 	"net/http"
 
@@ -68,8 +69,8 @@ func (h handlerProker) Create(c *gin.Context) {
 		PenanggungJawab: input.PenanggungJawab,
 		Kementrian:      input.Kementrian,
 		KontakPJ:        input.KontakPJ,
-		LinkPDFProker:   input.LinkPDFProker,
-		LinkDokumentasi: input.LinkDokumentasi,
+		LinkImages:      input.LinkImages,
+		LinkImages2:     input.LinkImages2,
 	}); err != nil {
 		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Error when create data in database", err.Error()))
 		return
@@ -95,5 +96,47 @@ func (h handlerProker) Delete(c *gin.Context) {
 }
 
 func (h handlerProker) Login(c *gin.Context) {
+	var input domain.AdminInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when bind JSON", err.Error()))
+		return
+	}
+	data, err := h.UseCase.Login(input.Username, input.Password)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ResponseWhenFail("Fail to login", err.Error()))
+		return
+	}
+	token, err := middleware.GenerateJWToken(data.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to generate token", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success to login", gin.H{
+		"token": token,
+	}))
+}
+
+func (h handlerProker) Register(c *gin.Context) {
+	var input domain.AdminInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when bind JSON", err.Error()))
+		return
+	}
+	data, err := h.UseCase.Register(&domain.Admin{
+		Username: input.Username,
+		Password: input.Password,
+	})
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ResponseWhenFail("Fail to register", err.Error()))
+		return
+	}
+	token, err := middleware.GenerateJWToken(data.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to generate token", err.Error()))
+		return
+	}
+	c.JSON(http.StatusCreated, response.ResponseWhenSuccess("Success to register", gin.H{
+		"token": token,
+	}))
 
 }

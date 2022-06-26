@@ -11,5 +11,6 @@ func NewRouter(e *gin.Engine, s domain.ProkerHandler) {
 	e.GET("/proker", s.GetAll)
 	e.GET("/proker/:id", s.GetByID)
 	e.POST("/proker", middleware.ValidateJWToken(), s.Create)
-	e.DELETE("/proker/:id", s.Delete)
+	e.DELETE("/proker/:id", middleware.ValidateJWToken(), s.Delete)
+	e.POST("/admin/login", s.Login)
 }

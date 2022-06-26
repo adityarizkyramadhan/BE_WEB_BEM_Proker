@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func GenerateJWToken(id string) (string, error) {
+func GenerateJWToken(id uint) (string, error) {
 	env, err := app.NewDriverApp()
 	if err != nil {
 		return "", err
@@ -29,20 +29,20 @@ func ValidateJWToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		bearerToken := c.Request.Header.Get("Authorization")
 		if bearerToken == "" {
-			//respon
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response.ResponseWhenFail("Unauthorized", nil))
 			return
 		}
 		bearerToken = strings.ReplaceAll(bearerToken, "Bearer ", "")
 		token, err := jwt.Parse(bearerToken, ekstractToken)
 		if err != nil {
-			c.JSON(http.StatusForbidden, response.ResponseWhenFail("Failed to extract token", err.Error()))
+			c.AbortWithStatusJSON(http.StatusForbidden, response.ResponseWhenFail("Failed to extract token", err.Error()))
 			return
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("id", claims["id"])
 			c.Next()
 		} else {
-			c.JSON(http.StatusForbidden, response.ResponseWhenFail("Failed to extract token", err.Error()))
+			c.AbortWithStatusJSON(http.StatusForbidden, response.ResponseWhenFail("Failed to extract token", err.Error()))
 			return
 		}
 	}
