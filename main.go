@@ -20,6 +20,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	e.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Hello World!",
+		})
+	})
 	route.RouteAllHandler(e, db)
 	if err := e.Run(); err != nil {
 		panic(err)
