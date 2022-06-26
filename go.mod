@@ -1,5 +1,6 @@
 module BE_WEB_BEM_Proker
 
+// +heroku goVersion go1.18
 go 1.18
 
 require (
