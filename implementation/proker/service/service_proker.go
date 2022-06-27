@@ -16,7 +16,7 @@ func NewServiceProker(db *gorm.DB) domain.ProkerService {
 
 func (s serviceProker) GetAll() ([]domain.EntitasProker, error) {
 	var datas []domain.EntitasProker
-	if err := s.db.Model(&domain.EntitasProker{}).Preload("SaveImages").Find(&datas).Error; err != nil {
+	if err := s.db.Model(&domain.EntitasProker{}).Find(&datas).Error; err != nil {
 		return []domain.EntitasProker{}, err
 	}
 	return datas, nil
