@@ -19,27 +19,12 @@ func NewHandlerProker(useCase domain.ProkerService) domain.ProkerHandler {
 	}
 }
 
-type getAllProker struct {
-	NamaProker      string `json:"nama_proker"`
-	WaktuTerlaksana string `json:"waktu_terlaksana"`
-	Kementrian      string `json:"kementrian"`
-}
-
 func (h handlerProker) GetAll(c *gin.Context) {
 	datas, err := h.UseCase.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get proker", err.Error()))
 	}
-	datas = datas[len(datas)-12:]
-	var dataOut []getAllProker
-	for _, data := range datas {
-		var dataIn getAllProker
-		dataIn.NamaProker = data.NamaProker
-		dataIn.WaktuTerlaksana = data.WaktuTerlaksana
-		dataIn.Kementrian = data.Kementrian
-		dataOut = append(dataOut, dataIn)
-	}
-	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success get proker", dataOut))
+	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success get proker", datas))
 }
 
 func (h handlerProker) GetByID(c *gin.Context) {

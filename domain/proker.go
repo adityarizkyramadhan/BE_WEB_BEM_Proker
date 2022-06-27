@@ -41,8 +41,8 @@ type EntitasProkerInput struct {
 }
 
 type ProkerService interface {
-	GetAll() ([]EntitasProker, error)
-	GetByID(uint) (EntitasProker, error)
+	GetAll() (*[]EntitasProker, error)
+	GetByID(uint) (*EntitasProker, error)
 	Create(*EntitasProker) error
 	Update(uint, *EntitasProker) error
 	Delete(uint) error

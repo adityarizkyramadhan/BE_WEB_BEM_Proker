@@ -14,20 +14,20 @@ func NewServiceProker(db *gorm.DB) domain.ProkerService {
 	return &serviceProker{db}
 }
 
-func (s serviceProker) GetAll() ([]domain.EntitasProker, error) {
+func (s serviceProker) GetAll() (*[]domain.EntitasProker, error) {
 	var datas []domain.EntitasProker
 	if err := s.db.Model(&domain.EntitasProker{}).Find(&datas).Error; err != nil {
-		return []domain.EntitasProker{}, err
+		return &[]domain.EntitasProker{}, err
 	}
-	return datas, nil
+	return &datas, nil
 }
 
-func (s serviceProker) GetByID(id uint) (domain.EntitasProker, error) {
+func (s serviceProker) GetByID(id uint) (*domain.EntitasProker, error) {
 	var data domain.EntitasProker
 	if err := s.db.Model(&domain.EntitasProker{}).Where("id = ?", id).Preload("SaveImages").Take(&data).Error; err != nil {
-		return domain.EntitasProker{}, err
+		return &domain.EntitasProker{}, err
 	}
-	return data, nil
+	return &data, nil
 }
 
 func (s serviceProker) Create(proker *domain.EntitasProker) error {
