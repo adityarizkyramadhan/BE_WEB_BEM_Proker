@@ -11,7 +11,13 @@ import (
 
 func main() {
 	e := gin.Default()
-	e.Use(cors.Default())
+	e.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 	env, err := database_driver.ReadEnvSupabase()
 	if err != nil {
 		panic(err)
