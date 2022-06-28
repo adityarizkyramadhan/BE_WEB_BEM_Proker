@@ -3,15 +3,15 @@ package main
 import (
 	"BE_WEB_BEM_Proker/infrastructure/database_connection"
 	"BE_WEB_BEM_Proker/infrastructure/database_driver"
-	"BE_WEB_BEM_Proker/middleware"
 	"BE_WEB_BEM_Proker/route"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	e := gin.Default()
-	e.Use(middleware.Cors())
+	e.Use(cors.Default())
 	env, err := database_driver.ReadEnvSupabase()
 	if err != nil {
 		panic(err)
