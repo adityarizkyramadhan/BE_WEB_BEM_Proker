@@ -6,21 +6,26 @@ import (
 )
 
 type EntitasProker struct {
-	*gorm.Model
-	NamaProker      string
-	Kementrian      string
-	WaktuTerlaksana string
-	Deskripsi       string
-	PenanggungJawab string
-	KontakPJ        string
-	LinkImages      string
-	LinkImages2     string
+	*gorm.Model     `json:"-"`
+	NamaProker      string    `json:"nama_proker"`
+	Kementrian      string    `json:"kementrian"`
+	WaktuTerlaksana string    `json:"waktu_terlaksana"`
+	Deskripsi       string    `json:"deskripsi"`
+	PenanggungJawab string    `json:"penanggung_jawab"`
+	KontakPJ        string    `json:"kontak_pj"`
+	LinkImage       LinkImage `gorm:"foreignkey:IdEntitasProker" json:"link_image"`
+}
+
+type LinkImage struct {
+	gorm.Model      `json:"-"`
+	Link            string `json:"link"`
+	IdEntitasProker uint   `json:"-"`
 }
 
 type Admin struct {
 	*gorm.Model
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `gorm:"uniqueIndex"`
+	Password string
 }
 
 type AdminInput struct {
@@ -35,9 +40,6 @@ type EntitasProkerInput struct {
 	Deskripsi       string `json:"deskripsi,omitempty" binding:"required"`
 	PenanggungJawab string `json:"penanggung_jawab,omitempty" binding:"required"`
 	KontakPJ        string `json:"kontak_pj,omitempty" binding:"required"`
-	LinkPdfProker   string `json:"link_pdf_proker,omitempty" binding:"required"`
-	LinkImages      string `json:"save_images,omitempty" binding:"required"`
-	LinkImages2     string `json:"save_images2,omitempty" binding:"required"`
 }
 
 type ProkerService interface {
@@ -48,6 +50,7 @@ type ProkerService interface {
 	Delete(uint) error
 	Login(string, string) (*Admin, error)
 	Register(*Admin) (*Admin, error)
+	SaveImage(string, uint) error
 }
 
 type ProkerHandler interface {
@@ -57,4 +60,5 @@ type ProkerHandler interface {
 	Delete(*gin.Context)
 	Login(*gin.Context)
 	Register(*gin.Context)
+	UploadImage(*gin.Context)
 }

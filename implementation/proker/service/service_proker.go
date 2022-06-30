@@ -16,7 +16,7 @@ func NewServiceProker(db *gorm.DB) domain.ProkerService {
 
 func (s serviceProker) GetAll() (*[]domain.EntitasProker, error) {
 	var datas []domain.EntitasProker
-	if err := s.db.Model(&domain.EntitasProker{}).Find(&datas).Error; err != nil {
+	if err := s.db.Model(&domain.EntitasProker{}).Preload("LinkImage").Find(&datas).Error; err != nil {
 		return &[]domain.EntitasProker{}, err
 	}
 	return &datas, nil
@@ -24,7 +24,7 @@ func (s serviceProker) GetAll() (*[]domain.EntitasProker, error) {
 
 func (s serviceProker) GetByID(id uint) (*domain.EntitasProker, error) {
 	var data domain.EntitasProker
-	if err := s.db.Model(&domain.EntitasProker{}).Where("id = ?", id).Preload("SaveImages").Take(&data).Error; err != nil {
+	if err := s.db.Model(&domain.EntitasProker{}).Where("id = ?", id).Preload("LinkImage").Take(&data).Error; err != nil {
 		return &domain.EntitasProker{}, err
 	}
 	return &data, nil
@@ -51,10 +51,13 @@ func (s serviceProker) Delete(id uint) error {
 	return nil
 }
 
-func (s serviceProker) Login(email string, password string) (*domain.Admin, error) {
+func (s serviceProker) Login(username string, password string) (*domain.Admin, error) {
 	var data domain.Admin
-	if err := s.db.Model(&domain.Admin{}).Where("email = ? AND password = ?", email, password).Take(&data).Error; err != nil {
+	if err := s.db.Model(&domain.Admin{}).Where("username = ?", username).Take(&data).Error; err != nil {
 		return &domain.Admin{}, err
+	}
+	if data.Password != password {
+		return &domain.Admin{}, nil
 	}
 	return &data, nil
 }
@@ -64,4 +67,11 @@ func (s serviceProker) Register(admin *domain.Admin) (*domain.Admin, error) {
 		return &domain.Admin{}, err
 	}
 	return admin, nil
+}
+
+func (s serviceProker) SaveImage(image string, id uint) error {
+	if err := s.db.Create(&domain.LinkImage{Link: image, IdEntitasProker: id}).Error; err != nil {
+		return err
+	}
+	return nil
 }

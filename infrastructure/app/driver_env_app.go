@@ -14,7 +14,6 @@ func readEnv() (DriverApp, error) {
 	}
 	return DriverApp{
 		SecretKey: envApp["SECRET_KEY"],
-		Password:  envApp["PASSWORD_LOGIN"],
 	}, nil
 }
 
