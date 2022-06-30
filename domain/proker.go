@@ -6,7 +6,7 @@ import (
 )
 
 type EntitasProker struct {
-	*gorm.Model     `json:"-"`
+	*gorm.Model
 	NamaProker      string    `json:"nama_proker"`
 	Kementrian      string    `json:"kementrian"`
 	WaktuTerlaksana string    `json:"waktu_terlaksana"`
@@ -45,7 +45,7 @@ type EntitasProkerInput struct {
 type ProkerService interface {
 	GetAll() (*[]EntitasProker, error)
 	GetByID(uint) (*EntitasProker, error)
-	Create(*EntitasProker) error
+	Create(*EntitasProker) (*EntitasProker, error)
 	Update(uint, *EntitasProker) error
 	Delete(uint) error
 	Login(string, string) (*Admin, error)

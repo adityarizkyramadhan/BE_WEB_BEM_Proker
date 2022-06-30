@@ -30,11 +30,11 @@ func (s serviceProker) GetByID(id uint) (*domain.EntitasProker, error) {
 	return &data, nil
 }
 
-func (s serviceProker) Create(proker *domain.EntitasProker) error {
+func (s serviceProker) Create(proker *domain.EntitasProker) (*domain.EntitasProker, error) {
 	if err := s.db.Model(&domain.EntitasProker{}).Create(&proker).Error; err != nil {
-		return err
+		return &domain.EntitasProker{}, err
 	}
-	return nil
+	return proker, nil
 }
 
 func (s serviceProker) Update(id uint, proker *domain.EntitasProker) error {

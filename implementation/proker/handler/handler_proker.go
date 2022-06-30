@@ -53,18 +53,19 @@ func (h handlerProker) Create(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when bind JSON", err.Error()))
 		return
 	}
-	if err := h.UseCase.Create(&domain.EntitasProker{
+	data, err := h.UseCase.Create(&domain.EntitasProker{
 		NamaProker:      input.NamaProker,
 		WaktuTerlaksana: input.WaktuTerlaksana,
 		Deskripsi:       input.Deskripsi,
 		PenanggungJawab: input.PenanggungJawab,
 		Kementrian:      input.Kementrian,
 		KontakPJ:        input.KontakPJ,
-	}); err != nil {
+	})
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Error when create data in database", err.Error()))
 		return
 	}
-	c.JSON(http.StatusCreated, response.ResponseWhenSuccess("Success when add data to database", nil))
+	c.JSON(http.StatusCreated, response.ResponseWhenSuccess("Success when add data to database", data))
 }
 
 type idProker struct {
