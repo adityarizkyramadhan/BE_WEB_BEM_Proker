@@ -155,10 +155,8 @@ func (h handlerProker) UploadImage(c *gin.Context) {
 	client := storage_go.NewClient("https://jgjyjvyldoamqndazixl.supabase.co/storage/v1", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnanlqdnlsZG9hbXFuZGF6aXhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDc4MzQ0MDQsImV4cCI6MTk2MzQxMDQwNH0.WVMjJIRoK_cnyfRXdYvTokNWBCCqLWfbeu7xXeZrs6I", nil)
 	fileName := fmt.Sprintf("data%d%s", id, fileInput.Filename)
 	fileName = strings.ReplaceAll(fileName, ".", "")
-	fmt.Println("Sampai selesai file name")
-	resp := client.UploadFile("foto-proker", fileName, file)
-	fmt.Println(resp)
-	fmt.Println("Sampai selesai upload file")
+	fileName = strings.ReplaceAll(fileName, " ", "")
+	client.UploadFile("foto-proker", fileName, file)
 	linkImage := utils.GenerateLinkImage(fileName)
 	if err := h.UseCase.SaveImage(linkImage, uint(id)); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ResponseWhenFail("Error when save image", err.Error()))
