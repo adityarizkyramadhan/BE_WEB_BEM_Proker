@@ -34,9 +34,9 @@ func InitHandlerAdmin(db db.DatabaseadminService) HandlerAdmin {
 }
 
 type inputAdminRegister struct {
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	Kementrian string `json:"kementrian"`
+	Username   string `json:"username" binding:"required"`
+	Password   string `json:"password" binding:"required"`
+	Kementrian string `json:"kementrian" binding:"required"`
 }
 
 func (h *handlerAdmin) Register(c *gin.Context) {
@@ -69,8 +69,13 @@ func (h *handlerAdmin) Register(c *gin.Context) {
 	}))
 }
 
+type inputAdminLogin struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 func (h *handlerAdmin) Login(c *gin.Context) {
-	var dataInput inputAdminRegister
+	var dataInput inputAdminLogin
 	if err := c.BindJSON(&dataInput); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Errorr when bind JSON", err.Error()))
 		return
