@@ -3,6 +3,7 @@ package main
 import (
 	"BE_WEB_BEM_Proker/infrastructure/database_connection"
 	"BE_WEB_BEM_Proker/infrastructure/database_driver"
+	"BE_WEB_BEM_Proker/middleware"
 	"BE_WEB_BEM_Proker/route"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,7 @@ func main() {
 			"message": "Hello World!",
 		})
 	})
+	e.Use(middleware.CORS())
 	route.InitRouteAll(e, db)
 	if err := e.Run(); err != nil {
 		panic(err)
