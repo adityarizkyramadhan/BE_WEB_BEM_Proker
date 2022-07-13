@@ -16,4 +16,5 @@ func InitAdminRouter(g *gin.RouterGroup, db *gorm.DB) {
 	g.GET("/", hAdmin.GetAllAdmin)
 	g.GET("/:id", hAdmin.GetAdminByID)
 	g.GET("/proker/:id", hAdmin.GetAdminByIDWithProker)
+	g.GET("/history", hAdmin.GetHistory)
 }

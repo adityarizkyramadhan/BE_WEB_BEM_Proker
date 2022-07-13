@@ -24,6 +24,7 @@ type HandlerAdmin interface {
 	GetAllAdmin(c *gin.Context)
 	GetAdminByID(c *gin.Context)
 	GetAdminByIDWithProker(c *gin.Context)
+	GetHistory(c *gin.Context)
 }
 
 func InitHandlerAdmin(db db.DatabaseadminService) HandlerAdmin {
@@ -133,6 +134,16 @@ func (h *handlerAdmin) GetAdminByIDWithProker(c *gin.Context) {
 		return
 	}
 	data, err := h.db.GetAdminByIDWithProker(uint(idAdmin))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when get admin by id", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success get admin by id", data))
+}
+
+func (h *handlerAdmin) GetHistory(c *gin.Context) {
+	idUSer := c.MustGet("id").(uint)
+	data, err := h.db.GetAdminByIDWithProker(idUSer)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when get admin by id", err.Error()))
 		return
