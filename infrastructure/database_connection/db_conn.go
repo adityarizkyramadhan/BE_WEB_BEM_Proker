@@ -20,7 +20,7 @@ func MakeConnection(data database_driver.DriverSupabase) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := db.AutoMigrate(&domain.EntitasProker{}, &domain.LinkImage{}, &domain.Admin{}); err != nil {
+	if err := db.AutoMigrate(&domain.EntitasAdmin{}, &domain.EntitasProker{}); err != nil {
 		return nil, err
 	}
 	return db, nil

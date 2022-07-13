@@ -1,18 +1,19 @@
 package route_delivery
 
 import (
-	"BE_WEB_BEM_Proker/domain"
+	databaseService "BE_WEB_BEM_Proker/implementation/proker/db"
+	handlerProker "BE_WEB_BEM_Proker/implementation/proker/handler"
 	"BE_WEB_BEM_Proker/middleware"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func NewRouter(e *gin.Engine, s domain.ProkerHandler) {
-	e.GET("/proker", s.GetAll)
-	e.GET("/proker/:id", s.GetByID)
-	e.POST("/proker", middleware.ValidateJWToken(), s.Create)
-	e.POST("/proker/:id/upload", middleware.ValidateJWToken(), s.UploadImage)
-	e.DELETE("/proker/:id", middleware.ValidateJWToken(), s.Delete)
-	e.POST("/admin/login", s.Login)
-	e.POST("/admin/register", s.Register)
+func InitProkerRouter(g *gin.RouterGroup, db *gorm.DB) {
+	dbServ := databaseService.InitProkerDB(db)
+	hProker := handlerProker.NewHandlerProker(dbServ)
+	g.GET("/", hProker.GetAll)
+	g.GET("/:id", hProker.GetByID)
+	g.DELETE("/:id", middleware.ValidateJWToken(), hProker.Delete)
+	g.POST("/add", middleware.ValidateJWToken(), hProker.Create)
 }

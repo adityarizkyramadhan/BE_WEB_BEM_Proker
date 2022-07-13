@@ -39,7 +39,8 @@ func ValidateJWToken() gin.HandlerFunc {
 			return
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			c.Set("id", claims["id"])
+			userId := uint(claims["id"].(float64))
+			c.Set("id", userId)
 			c.Next()
 		} else {
 			c.AbortWithStatusJSON(http.StatusForbidden, response.ResponseWhenFail("Failed to extract token", err.Error()))

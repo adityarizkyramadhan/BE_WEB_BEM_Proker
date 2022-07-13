@@ -2,33 +2,41 @@ package handler
 
 import (
 	"BE_WEB_BEM_Proker/domain"
-	"BE_WEB_BEM_Proker/middleware"
+	"BE_WEB_BEM_Proker/implementation/proker/db"
 	"BE_WEB_BEM_Proker/utils/response"
-	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"BE_WEB_BEM_Proker/utils"
 
 	"github.com/gin-gonic/gin"
-	storage_go "github.com/supabase-community/storage-go"
 )
 
+var handler *handlerProker
+
 type handlerProker struct {
-	UseCase domain.ProkerService
+	db db.DatabaseService
 }
 
-func NewHandlerProker(useCase domain.ProkerService) domain.ProkerHandler {
-	return handlerProker{
-		UseCase: useCase,
+type HandlerProker interface {
+	GetAll(c *gin.Context)
+	GetByID(c *gin.Context)
+	Delete(c *gin.Context)
+	Create(c *gin.Context)
+}
+
+func NewHandlerProker(db db.DatabaseService) HandlerProker {
+	if handler == nil {
+		handler = &handlerProker{
+			db: db,
+		}
 	}
+	return handler
 }
 
-func (h handlerProker) GetAll(c *gin.Context) {
-	datas, err := h.UseCase.GetAll()
+func (h *handlerProker) GetAll(c *gin.Context) {
+	datas, err := h.db.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get proker", err.Error()))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get proker", err.Error()))
 	}
 	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success get proker", datas))
 }
@@ -36,131 +44,109 @@ func (h handlerProker) GetAll(c *gin.Context) {
 func (h handlerProker) GetByID(c *gin.Context) {
 	var idpkr idProker
 	if err := c.BindUri(&idpkr); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Errorr when bind URI", err.Error()))
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Errorr when bind URI", err.Error()))
 		return
 	}
-	data, err := h.UseCase.GetByID(idpkr.Id)
+	data, err := h.db.GetByID(idpkr.Id)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, response.ResponseWhenFail("Fail to connect database", err.Error()))
+		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ResponseWhenFail("Fail to connect database", err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success", data))
 }
 
-func (h handlerProker) Create(c *gin.Context) {
-	var input domain.EntitasProkerInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when bind JSON", err.Error()))
-		return
-	}
-	data, err := h.UseCase.Create(&domain.EntitasProker{
-		NamaProker:      input.NamaProker,
-		WaktuTerlaksana: input.WaktuTerlaksana,
-		Deskripsi:       input.Deskripsi,
-		PenanggungJawab: input.PenanggungJawab,
-		Kementrian:      input.Kementrian,
-		KontakPJ:        input.KontakPJ,
-	})
+func (h *handlerProker) Create(c *gin.Context) {
+	idAdmin := c.MustGet("id").(uint)
+	namaProker := c.Request.FormValue("nama_proker")
+	waktuTerlaksana := c.Request.FormValue("waktu_terlaksana")
+	deskripsi := c.Request.FormValue("deskripsi")
+	penanggungJawab := c.Request.FormValue("penanggung_jawab")
+	kontakPJ := c.Request.FormValue("kontak_pj")
+	fileCover, err := c.FormFile("file_cover")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Error when create data in database", err.Error()))
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Errorr when bind file cover", err.Error()))
 		return
 	}
-	c.JSON(http.StatusCreated, response.ResponseWhenSuccess("Success when add data to database", data))
+	fileKegiatan, err := c.FormFile("file_kegiatan_satu")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Errorr when bind file keg satu", err.Error()))
+		return
+	}
+	fileKegiatanDua, err := c.FormFile("file_kegiatan_dua")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Errorr when bind file keg dua", err.Error()))
+		return
+	}
+	fileKegiatanTiga, err := c.FormFile("file_kegiatan_tiga")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when get file keg tiga", err.Error()))
+		return
+	}
+	if namaProker == "" || waktuTerlaksana == "" || deskripsi == "" || penanggungJawab == "" || kontakPJ == "" {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when get form", "Form tidak boleh kosong"))
+		return
+	}
+	if fileCover == nil || fileKegiatan == nil || fileKegiatanDua == nil || fileKegiatanTiga == nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when get file", "File tidak boleh kosong"))
+		return
+	}
+	if fileCover.Size > utils.MaxFileSize || fileKegiatan.Size > utils.MaxFileSize || fileKegiatanDua.Size > utils.MaxFileSize || fileKegiatanTiga.Size > utils.MaxFileSize {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when get file", "File cover tidak boleh lebih dari 5 MB"))
+		return
+	}
+	linkCover, err := utils.UploadImage(fileCover)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when upload file", err.Error()))
+		return
+	}
+	linkKegiatan, err := utils.UploadImage(fileKegiatan)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when upload file", err.Error()))
+		return
+	}
+	linkKegiatanDua, err := utils.UploadImage(fileKegiatanDua)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when upload file", err.Error()))
+		return
+	}
+	linkKegiatanTiga, err := utils.UploadImage(fileKegiatanTiga)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when upload file", err.Error()))
+		return
+	}
+	data := domain.EntitasProker{
+		NamaProker:       namaProker,
+		WaktuTerlaksana:  waktuTerlaksana,
+		Deskripsi:        deskripsi,
+		PenanggungJawab:  penanggungJawab,
+		KontakPJ:         kontakPJ,
+		LinkCover:        linkCover,
+		LinkKegiatan:     linkKegiatan,
+		LinkKegiatanDua:  linkKegiatanDua,
+		LinkKegiatanTiga: linkKegiatanTiga,
+		EntitasAdminID:   uint(idAdmin),
+	}
+	if err := h.db.CreateProker(data); err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when create proker", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success create proker", data))
+
 }
 
 type idProker struct {
 	Id uint `uri:"id"`
 }
 
-func (h handlerProker) Delete(c *gin.Context) {
+func (h *handlerProker) Delete(c *gin.Context) {
 	var idPrkr idProker
 	if err := c.ShouldBindUri(&idPrkr); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Fail to bind uri", err.Error()))
 		return
 	}
-	if err := h.UseCase.Delete(idPrkr.Id); err != nil {
+	if err := h.db.Delete(idPrkr.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to delete data", err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success to delete data", nil))
-}
-
-func (h handlerProker) Login(c *gin.Context) {
-	var input domain.AdminInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when bind JSON", err.Error()))
-		return
-	}
-	data, err := h.UseCase.Login(input.Username, input.Password)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ResponseWhenFail("Fail to login", err.Error()))
-		return
-	}
-	if data == nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ResponseWhenFail("Username or password is wrong", nil))
-		return
-	}
-	token, err := middleware.GenerateJWToken(data.ID)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to generate token", err.Error()))
-		return
-	}
-	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success to login", gin.H{
-		"token": token,
-	}))
-}
-
-func (h handlerProker) Register(c *gin.Context) {
-	var input domain.AdminInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when bind JSON", err.Error()))
-		return
-	}
-	data, err := h.UseCase.Register(&domain.Admin{
-		Username: input.Username,
-		Password: input.Password,
-	})
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ResponseWhenFail("Fail to register", err.Error()))
-		return
-	}
-	token, err := middleware.GenerateJWToken(data.ID)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to generate token", err.Error()))
-		return
-	}
-	c.JSON(http.StatusCreated, response.ResponseWhenSuccess("Success to register", gin.H{
-		"token": token,
-	}))
-}
-
-func (h handlerProker) UploadImage(c *gin.Context) {
-	idFoto := c.Param("id")
-	// convert id to int
-	id, err := strconv.Atoi(idFoto)
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when convert id to int", err.Error()))
-		return
-	}
-	fileInput, err := c.FormFile("file")
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when get file", err.Error()))
-		return
-	}
-	file, err := fileInput.Open()
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when open file", err.Error()))
-		return
-	}
-	client := storage_go.NewClient("https://jgjyjvyldoamqndazixl.supabase.co/storage/v1", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnanlqdnlsZG9hbXFuZGF6aXhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDc4MzQ0MDQsImV4cCI6MTk2MzQxMDQwNH0.WVMjJIRoK_cnyfRXdYvTokNWBCCqLWfbeu7xXeZrs6I", nil)
-	fileName := fmt.Sprintf("data%d%s", id, fileInput.Filename)
-	fileName = strings.ReplaceAll(fileName, ".", "")
-	fileName = strings.ReplaceAll(fileName, " ", "")
-	client.UploadFile("foto-proker", fileName, file)
-	linkImage := utils.GenerateLinkImage(fileName)
-	if err := h.UseCase.SaveImage(linkImage, uint(id)); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ResponseWhenFail("Error when save image", err.Error()))
-		return
-	}
-	c.JSON(http.StatusCreated, response.ResponseWhenSuccess("Success to upload image", nil))
 }

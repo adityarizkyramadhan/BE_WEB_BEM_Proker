@@ -1,16 +1,14 @@
 package route
 
 import (
-	"BE_WEB_BEM_Proker/implementation/proker/handler"
-	"BE_WEB_BEM_Proker/implementation/proker/route_delivery"
-	"BE_WEB_BEM_Proker/implementation/proker/service"
+	routeAdmin "BE_WEB_BEM_Proker/implementation/admin/route_delivery"
+	routeProker "BE_WEB_BEM_Proker/implementation/proker/route_delivery"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func RouteAllHandler(e *gin.Engine, db *gorm.DB) {
-	serv := service.NewServiceProker(db)
-	handler := handler.NewHandlerProker(serv)
-	route_delivery.NewRouter(e, handler)
+func InitRouteAll(e *gin.Engine, db *gorm.DB) {
+	routeAdmin.InitAdminRouter(e.Group("/admin"), db)
+	routeProker.InitProkerRouter(e.Group("/proker"), db)
 }
