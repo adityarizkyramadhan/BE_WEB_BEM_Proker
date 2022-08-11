@@ -48,7 +48,16 @@ func (h *handlerProker) Paging(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get data", err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success to get data", data))
+	dataAll, err := h.db.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get data", err.Error()))
+		return
+	}
+	len := len(dataAll)
+	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success to get data", gin.H{
+		"data":        data,
+		"banyak_data": len,
+	}))
 }
 
 func (h *handlerProker) GetAll(c *gin.Context) {
@@ -148,7 +157,7 @@ func (h *handlerProker) Create(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, response.ResponseWhenFail("Error when create proker", err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success create proker", data))
+	c.JSON(http.StatusCreated, response.ResponseWhenSuccess("Success create proker", data))
 
 }
 
