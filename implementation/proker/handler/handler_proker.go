@@ -37,23 +37,24 @@ func NewHandlerProker(db db.DatabaseService) HandlerProker {
 func (h *handlerProker) Paging(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("limit"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
-	if page == 0 {
-		page = 1
-	}
-	if limit == 0 {
-		limit = 10
-	}
-	data, err := h.db.Paging(page, limit)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get data", err.Error()))
-		return
-	}
 	dataAll, err := h.db.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get data", err.Error()))
 		return
 	}
 	len := len(dataAll)
+	if page == 0 {
+		page = 1
+	}
+	if limit == 0 || limit > len {
+		limit = len
+	}
+	data, err := h.db.Paging(page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.ResponseWhenFail("Fail to get data", err.Error()))
+		return
+	}
+
 	c.JSON(http.StatusOK, response.ResponseWhenSuccess("Success to get data", gin.H{
 		"data":        data,
 		"banyak_data": len,
