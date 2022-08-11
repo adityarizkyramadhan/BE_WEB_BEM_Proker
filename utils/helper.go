@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"mime/multipart"
 	"time"
@@ -13,6 +14,9 @@ const (
 )
 
 func UploadImage(fileInput *multipart.FileHeader) (string, error) {
+	if fileInput.Size > 6*1024*1024 {
+		return "", errors.New("file size is too big")
+	}
 	file, err := fileInput.Open()
 	if err != nil {
 		return "", err
