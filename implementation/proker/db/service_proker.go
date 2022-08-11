@@ -11,10 +11,11 @@ type prokerDatabase struct {
 }
 
 type DatabaseService interface {
-	GetAll() (*[]domain.EntitasProker, error)
+	GetAll() ([]*domain.EntitasProker, error)
 	CreateProker(proker domain.EntitasProker) error
 	GetByID(id uint) (*domain.EntitasProker, error)
 	Delete(id uint) error
+	Paging(page int, perPage int) ([]*domain.EntitasProker, error)
 }
 
 var prokerDB *prokerDatabase
@@ -27,13 +28,22 @@ func InitProkerDB(db *gorm.DB) DatabaseService {
 	return prokerDB
 }
 
-func (p *prokerDatabase) GetAll() (*[]domain.EntitasProker, error) {
-	var prokers []domain.EntitasProker
+func (p *prokerDatabase) Paging(page int, perPage int) ([]*domain.EntitasProker, error) {
+	var prokers []*domain.EntitasProker
+	err := p.db.Offset((page - 1) * perPage).Limit(perPage).Find(&prokers).Error
+	if err != nil {
+		return nil, err
+	}
+	return prokers, nil
+}
+
+func (p *prokerDatabase) GetAll() ([]*domain.EntitasProker, error) {
+	var prokers []*domain.EntitasProker
 	err := p.db.Find(&prokers).Error
 	if err != nil {
 		return nil, err
 	}
-	return &prokers, nil
+	return prokers, nil
 }
 
 func (p *prokerDatabase) CreateProker(proker domain.EntitasProker) error {
