@@ -35,7 +35,7 @@ func NewHandlerProker(db db.DatabaseService) HandlerProker {
 	return handler
 }
 func (h *handlerProker) Paging(c *gin.Context) {
-	page, _ := strconv.Atoi(c.Query("limit"))
+	page, _ := strconv.Atoi(c.Query("page"))
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	dataAll, err := h.db.GetAll()
 	if err != nil {
