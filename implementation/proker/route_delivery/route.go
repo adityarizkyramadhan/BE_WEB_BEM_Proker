@@ -16,4 +16,5 @@ func InitProkerRouter(g *gin.RouterGroup, db *gorm.DB) {
 	g.GET("/:id", hProker.GetByID)
 	g.DELETE("/:id", middleware.ValidateJWToken(), hProker.Delete)
 	g.POST("/add", middleware.ValidateJWToken(), hProker.Create)
+	g.GET("/paging", hProker.Paging)
 }
