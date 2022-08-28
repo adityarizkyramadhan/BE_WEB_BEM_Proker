@@ -28,5 +28,6 @@ WORKDIR /root/
 RUN mkdir -p ./assets/image/product
 
 COPY --from=builder /app/main .
+COPY --from=builder /app/.env .
 
 CMD ["./main"]
