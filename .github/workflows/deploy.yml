@@ -26,7 +26,7 @@ jobs:
             server: ${{ secrets.SSH_HOST }}
             ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
             local_path: './*'
-            remote_path: '/home/bemfilkom2022/BE_WEB_BEM_Proker'
+            remote_path: '/home/bemfilkomv2/BE_WEB_BEM_Proker'
 
       - name: 🌟 Run server
         uses: appleboy/ssh-action@master
@@ -35,6 +35,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/bemfilkom2022/BE_WEB_BEM_Proker
-            sudo npm install
-            sudo pm2 start index.js --name backend-dev
+            cd /home/bemfilkomv2/BE_WEB_BEM_Proker
+            go build .
+            pm2 start -f ./BE_WEB_BEM_Proker
