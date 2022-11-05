@@ -22,7 +22,7 @@ func main() {
 	e.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Hello World!",
-			"test":    "ci/cd",
+			"test":    "test lagi",
 		})
 	})
 	e.Use(cors.Default())
