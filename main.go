@@ -3,9 +3,9 @@ package main
 import (
 	"BE_WEB_BEM_Proker/infrastructure/database_connection"
 	"BE_WEB_BEM_Proker/infrastructure/database_driver"
-	"BE_WEB_BEM_Proker/middleware"
 	"BE_WEB_BEM_Proker/route"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,9 +24,9 @@ func main() {
 			"message": "Hello World!",
 		})
 	})
-	e.Use(middleware.CORS())
+	e.Use(cors.Default())
 	route.InitRouteAll(e, db)
-	if err := e.Run(); err != nil {
+	if err := e.Run(":8070"); err != nil {
 		panic(err)
 	}
 	// client := storage_go.NewClient("https://jgjyjvyldoamqndazixl.supabase.co/storage/v1", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnanlqdnlsZG9hbXFuZGF6aXhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDc4MzQ0MDQsImV4cCI6MTk2MzQxMDQwNH0.WVMjJIRoK_cnyfRXdYvTokNWBCCqLWfbeu7xXeZrs6I", nil)

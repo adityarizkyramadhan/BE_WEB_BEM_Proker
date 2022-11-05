@@ -1,0 +1,8 @@
+{
+    "apps": [
+        {
+            "name": "BEM_PROKER",
+            "script": "go run main.go"
+        }
+    ]
+}

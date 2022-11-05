@@ -20,7 +20,7 @@ type DatabaseService interface {
 
 var prokerDB *prokerDatabase
 
-//Biar db yang dikirim datanya cuma itu itu saja
+// Biar db yang dikirim datanya cuma itu itu saja
 func InitProkerDB(db *gorm.DB) DatabaseService {
 	if prokerDB == nil {
 		prokerDB = &prokerDatabase{db}
@@ -69,4 +69,13 @@ func (p *prokerDatabase) Delete(id uint) error {
 		return err
 	}
 	return nil
+}
+
+func (p *prokerDatabase) GetByKementrian(idKementrian uint) (*domain.EntitasProker, error) {
+	var data *domain.EntitasProker
+	err := p.db.Where("entitas_admin_id = ?", idKementrian).Find(data).Error
+	if err != nil {
+		return nil, err
+	}
+	return data, err
 }
