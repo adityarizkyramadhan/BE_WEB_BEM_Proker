@@ -3,9 +3,9 @@ package main
 import (
 	"BE_WEB_BEM_Proker/infrastructure/database_connection"
 	"BE_WEB_BEM_Proker/infrastructure/database_driver"
+	"BE_WEB_BEM_Proker/middleware"
 	"BE_WEB_BEM_Proker/route"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,13 +19,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	e.GET("/", func(c *gin.Context) {
+	e.Use(middleware.CORS())
+	e.GET("", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Hello World!",
 			"test":    "test lagi",
 		})
 	})
-	e.Use(cors.Default())
 	route.InitRouteAll(e, db)
 	if err := e.Run(":8070"); err != nil {
 		panic(err)
