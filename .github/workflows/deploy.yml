@@ -35,6 +35,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            sudo pm2 delete BE_WEB_BEM_Proker
             cd /home/bemfilkomv2/BE_WEB_BEM_Proker
             go build .
-            pm2 start -f ./BE_WEB_BEM_Proker
+            sudo pm2 start -f ./BE_WEB_BEM_Proker
