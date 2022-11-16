@@ -23,7 +23,7 @@ func main() {
 	e.GET("", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Hello World!",
-			"test":    "Ini lagi mencoba cd ke tiga menambahi cache hahaha",
+			"test":    "Ini lagi mencoba cd ke empat menambahi cache hahaha",
 		})
 	})
 	route.InitRouteAll(e, db)
