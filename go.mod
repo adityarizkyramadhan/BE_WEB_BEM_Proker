@@ -6,7 +6,15 @@ go 1.18
 require github.com/gin-contrib/cors v1.4.0
 
 require (
+	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
+	github.com/gomodule/redigo v1.8.9 // indirect
+	github.com/memcachier/mc/v3 v3.0.3 // indirect
+	github.com/robfig/go-cache v0.0.0-20130306151617-9fc39e0dbf62 // indirect
+)
+
+require (
 	github.com/766b/go-outliner v0.0.0-20180511142203-fc6edecdadd7 // indirect
+	github.com/gin-contrib/cache v1.2.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.8.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect

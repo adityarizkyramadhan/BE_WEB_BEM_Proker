@@ -11,14 +11,6 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v2
 
-      # - name: 🚀 Remove existing directory
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USERNAME }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     script: |
-      #       cd /home/djabari_dev/simlk-api
       - name: 📁 Send files via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
@@ -38,4 +30,4 @@ jobs:
             sudo pm2 delete BE_WEB_BEM_Proker
             cd /home/bemfilkomv2/BE_WEB_BEM_Proker
             go build .
-            sudo pm2 start -f ./BE_WEB_BEM_Proker
+            sudo pm2 start ./BE_WEB_BEM_Proker
