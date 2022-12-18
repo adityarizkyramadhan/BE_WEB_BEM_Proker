@@ -39,7 +39,7 @@ func (p *prokerDatabase) Paging(page int, perPage int) ([]*domain.EntitasProker,
 
 func (p *prokerDatabase) GetAll() ([]*domain.EntitasProker, error) {
 	var prokers []*domain.EntitasProker
-	err := p.db.Order("created_at ASC").Find(&prokers).Error
+	err := p.db.Order("created_at DESC").Find(&prokers).Error
 	if err != nil {
 		return nil, err
 	}
